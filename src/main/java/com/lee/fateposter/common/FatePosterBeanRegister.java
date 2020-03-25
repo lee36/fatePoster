@@ -1,7 +1,12 @@
 package com.lee.fateposter.common;
 
 import com.lee.fateposter.annotation.EnableFatePoster;
+import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.StringUtils;
@@ -17,18 +22,17 @@ import java.util.Optional;
  */
 public class FatePosterBeanRegister implements ImportBeanDefinitionRegistrar {
 
-    private static final String ENABLE_FATE_POSTER_NAME = EnableFatePoster.class.getName();
-    private static final Boolean USE_DEFAULT_FILTER=false;
+    private static final String FATE_POSTER_CONFIGURE_NAME = FatePosterConfigure.class.getName();
+
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata,
                                         BeanDefinitionRegistry beanDefinitionRegistry) {
-        Map<String,Object> map = annotationMetadata.
-                getAnnotationAttributes(ENABLE_FATE_POSTER_NAME);
-        String packages = Optional.ofNullable(map).map((each) -> each.get("value"))
-                .filter((str)->!StringUtils.isEmpty(str)).map((src)->(String)src)
-                .orElseThrow(() -> new RuntimeException("please input the package src"));
-        FatePosterBeanDefinitionScanner scanner = 
-                new FatePosterBeanDefinitionScanner(beanDefinitionRegistry,USE_DEFAULT_FILTER);
-        scanner.scan(packages);
+
+        AnnotatedGenericBeanDefinition definition = new
+                AnnotatedGenericBeanDefinition(FatePosterConfigure.class);
+        definition.getConstructorArgumentValues().addGenericArgumentValue(annotationMetadata);
+        AnnotationConfigUtils.processCommonDefinitionAnnotations(definition);
+        BeanDefinitionHolder holder = new BeanDefinitionHolder(definition,FATE_POSTER_CONFIGURE_NAME);
+        BeanDefinitionReaderUtils.registerBeanDefinition(holder,beanDefinitionRegistry);
     }
 }
