@@ -17,6 +17,7 @@ import java.util.HashMap;
 public class FatePosterApplication implements ApplicationRunner{
     @Autowired
     private MyTest studentTest;
+
     public static void main(String[] args) {
         SpringApplication.run(FatePosterApplication.class, args);
     }
