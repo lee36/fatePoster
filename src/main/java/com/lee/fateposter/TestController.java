@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 public class TestController {
     @RequestMapping("/app/test")
-    public User test(User user){
+    public User test(@RequestBody User user){
         return user;
     }
 }

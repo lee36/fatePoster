@@ -47,7 +47,7 @@ public abstract class AbstractMethodBuilder implements MethodBuilder {
         for (String key : map.keySet()) {
             Object param = map.get(key);
             Class<?> aClass = param.getClass();
-            if(!ComplexClass(aClass)){
+            if(!isNotComplexClass(aClass)){
                 urlBuilder.addQueryParameter(key,param+"");
             }else {
                 Field[] fields = aClass.getFields();
@@ -62,18 +62,19 @@ public abstract class AbstractMethodBuilder implements MethodBuilder {
     public RequestBody wrapRequestBody(HttpInfo info) throws Exception {
         String json = checkRequestBody(info);
         if(json!=null){
-            return RequestBody.create(JSON, json);
+            return RequestBody.create(json,JSON);
         }
         FormBody.Builder builder = new FormBody.Builder();
         Map<String, Object> map = info.getNomalMap();
         for (String key : map.keySet()) {
             Object param = map.get(key);
             Class<?> aClass = param.getClass();
-            if(!ComplexClass(aClass)){
+            if(isNotComplexClass(aClass)){
                 builder.add(key,param+"");
             }else {
-                Field[] fields = aClass.getFields();
+                Field[] fields = aClass.getDeclaredFields();
                 for (Field field : fields) {
+                    field.setAccessible(true);
                     builder.add(field.getName(), field.get(param) + "");
                 }
             }
@@ -95,7 +96,7 @@ public abstract class AbstractMethodBuilder implements MethodBuilder {
         return null;
     }
 
-    private boolean ComplexClass(Class<?> aClass) {
+    private boolean isNotComplexClass(Class<?> aClass) {
        if(int.class==aClass||Integer.class==aClass){
            return true;
        }else if(long.class==aClass||Long.class==aClass){

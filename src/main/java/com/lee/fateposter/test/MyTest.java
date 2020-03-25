@@ -15,5 +15,5 @@ import java.util.Map;
  */
 public interface MyTest {
     @Poster(url = "http://localhost:8080/app/test/",method = RequestMethod.POST,header = {"aa","123","bb","321"})
-    public String test(User map);
+    public String test(@RequestBody User map);
 }
