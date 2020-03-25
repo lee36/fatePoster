@@ -1,5 +1,8 @@
 package com.lee.fateposter.proxy;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -11,9 +14,10 @@ import java.util.Date;
  * @Author lhj
  * @create 2020/3/24 0024 21:17
  */
-public class FatePosterFactoryBean<T> implements FactoryBean<T> {
+public class FatePosterFactoryBean<T> implements FactoryBean<T>, BeanFactoryAware {
 
     private Class fatePosterInterface;
+    private BeanFactory beanFactory;
 
     public FatePosterFactoryBean(Class  fatePosterInterface){
         this.fatePosterInterface=fatePosterInterface;
@@ -22,12 +26,17 @@ public class FatePosterFactoryBean<T> implements FactoryBean<T> {
     @Override
     public T getObject() throws Exception {
         FatePostProxy proxy =
-                new FatePostProxy(fatePosterInterface);
+                new FatePostProxy(fatePosterInterface,beanFactory);
         return (T)proxy.invoke();
     }
 
     @Override
     public Class<T> getObjectType() {
         return this.fatePosterInterface;
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory=beanFactory;
     }
 }

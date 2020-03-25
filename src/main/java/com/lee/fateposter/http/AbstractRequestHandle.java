@@ -13,9 +13,11 @@ import okhttp3.Response;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -26,15 +28,13 @@ import java.util.*;
 public abstract class AbstractRequestHandle implements RequestHandle,BeanFactoryPostProcessor {
 
      private List<RequestFilter> requestFilterList;
-     private List<RequestConverter> requestConverterList;
-     private List<ResponseConverter> responseConverterList;
+     private ResponseConverter responseConverter;
      private List<MethodBuilder> methodBuilderList;
      private ConfigurableListableBeanFactory beanFactory;
 
      public AbstractRequestHandle(){
          requestFilterList=new ArrayList<>();
-         requestConverterList= new ArrayList<>();
-         responseConverterList=new ArrayList<>();
+         methodBuilderList=new ArrayList<>();
      }
 
     private void initRequestFilter(BeanFactory factory) {
@@ -42,7 +42,7 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
         requestFilterList.add(new FirsterRequestFilter());
        //加载用户自定义
        //SPI 以及 component
-       loadSPI(RequestFilter.class,requestConverterList);
+       loadSPI(RequestFilter.class,requestFilterList);
        loadFromIOC(RequestFilter.class,factory,requestFilterList);
     }
 
@@ -64,30 +64,22 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
         }
     }
 
-    private void initRequestConverter(BeanFactory factory) {
-        //加载内置
-        requestConverterList.add(new FirsterRequestConverter());
-        //加载用户自定义
-        //SPI 以及 component
-        loadSPI(RequestConverter.class,requestConverterList);
-        loadFromIOC(RequestConverter.class,factory,requestConverterList);
-    }
     private void initResponseConverter(BeanFactory factory) {
         //加载内置
-        responseConverterList.add(new FirsterResponseConverter());
+        responseConverter=new FirsterResponseConverter();
         //加载用户自定义
-        //SPI 以及 component
-        loadSPI(ResponseConverter.class,responseConverterList);
-        loadFromIOC(ResponseConverter.class,factory,responseConverterList);
+        try {
+            ResponseConverter converter = beanFactory.getBean(ResponseConverter.class);
+            responseConverter=converter;
+        }catch (NoSuchBeanDefinitionException e){}
     }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        this.beanFactory=beanFactory;
         initRequestFilter(beanFactory);
-        initRequestConverter(beanFactory);
         initResponseConverter(beanFactory);
         initMethodBuilder();
-        this.beanFactory=beanFactory;
     }
 
     private void initMethodBuilder() {
@@ -107,7 +99,16 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
             throw new RuntimeException("please insure at last a instance which is OkHttpClient");
         }
         Call call = httpClient.newCall(request);
-        return null;
+        Response response = null;
+        try {
+            response = call.execute();
+            //responseConverter
+            Object result = responseConverter.converter(info, response);
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("exec fail");
+        }
     }
     public abstract Request buildRequest(HttpInfo info);
 
@@ -119,20 +120,20 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
         this.requestFilterList = requestFilterList;
     }
 
-    public List<RequestConverter> getRequestConverterList() {
-        return requestConverterList;
+    public ResponseConverter getResponseConverter() {
+        return responseConverter;
     }
 
-    public void setRequestConverterList(List<RequestConverter> requestConverterList) {
-        this.requestConverterList = requestConverterList;
+    public void setResponseConverter(ResponseConverter responseConverter) {
+        this.responseConverter = responseConverter;
     }
 
-    public List<ResponseConverter> getResponseConverterList() {
-        return responseConverterList;
+    public ConfigurableListableBeanFactory getBeanFactory() {
+        return beanFactory;
     }
 
-    public void setResponseConverterList(List<ResponseConverter> responseConverterList) {
-        this.responseConverterList = responseConverterList;
+    public void setBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 
     public List<MethodBuilder> getMethodBuilderList() {

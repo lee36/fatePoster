@@ -1,6 +1,7 @@
 package com.lee.fateposter.config;
 
 import com.lee.fateposter.http.DefaultRequestHandle;
+import com.lee.fateposter.proxy.FatePosterInvocationHandler;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,5 +24,9 @@ public class FatePostConfiguration {
         OkHttpClient.Builder builder =
                 new OkHttpClient.Builder();
         return builder.build();
+    }
+    @Bean
+    public FatePosterInvocationHandler handler(){
+        return new FatePosterInvocationHandler();
     }
 }

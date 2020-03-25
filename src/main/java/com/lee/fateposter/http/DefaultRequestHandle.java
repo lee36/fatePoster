@@ -18,7 +18,12 @@ public class DefaultRequestHandle extends AbstractRequestHandle{
                 getMethodBuilderList();
         for (MethodBuilder methodBuilder : builderList) {
             if(methodBuilder.support(info.getRequestMethod())){
-                Request request = methodBuilder.buildRequest(info);
+                Request request = null;
+                try {
+                    request = methodBuilder.buildRequest(info);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return request;
             }
         }

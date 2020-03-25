@@ -37,6 +37,7 @@ public class HttpInfo {
     private Map<String,Object> nomalMap;
     private Map<String,Object> pathVaribleMap;
     private Boolean isPathVarible;
+    private Map<String,Parameter> parameterMap;
 
     public static final String REGEX= "\\{([^}]*)\\}";
     public static final Class<PathVariable> PATH_VARIBLE_CLASS= PathVariable.class;
@@ -47,7 +48,7 @@ public class HttpInfo {
     }
 
 
-    private void wrapInfo(Method method,List<Object> args) {
+    private void wrapInfo(Method method, List<Object> args) {
         Poster annotation =
                 method.getAnnotation(FatePosterInvocationHandler.POSTER_CLASS);
         this.hearders = wrapHeader(annotation.header());
@@ -64,19 +65,30 @@ public class HttpInfo {
                 .orElseThrow(()->new RuntimeException("please input the url"));
     }
 
-    private void wrapParams(Method method,List<Object> args) {
+    public Map<String, Parameter> getParameterMap() {
+        return parameterMap;
+    }
+
+    public void setParameterMap(Map<String, Parameter> parameterMap) {
+        this.parameterMap = parameterMap;
+    }
+
+    private void wrapParams(Method method, List<Object> args) {
         Map<String, Object> nomalMap = Maps.newHashMap();
         Map<String, Object> pathVaribleMap = Maps.newHashMap();
+        Map<String, Parameter> parameterMap = Maps.newHashMap();
         Parameter[] parameters = method.getParameters();
         for (int i=0;i<parameters.length;i++){
             if(!parameters[i].isAnnotationPresent(PATH_VARIBLE_CLASS)){
                 nomalMap.put(parameters[i].getName(),args.get(i));
+                parameterMap.put(parameters[i].getName(),parameters[i]);
             }else{
                 pathVaribleMap.put("{"+parameters[i].getName()+"}",args.get(i));
             }
         }
         this.nomalMap=nomalMap;
         this.pathVaribleMap=pathVaribleMap;
+        this.parameterMap=parameterMap;
     }
 
     private String wrapPathVarible(Poster poster,Map<String,Object> params) {
@@ -161,5 +173,21 @@ public class HttpInfo {
                 ", pathVaribleMap=" + pathVaribleMap +
                 ", isPathVarible=" + isPathVarible +
                 '}';
+    }
+
+    public Map<String, Object> getNomalMap() {
+        return nomalMap;
+    }
+
+    public void setNomalMap(Map<String, Object> nomalMap) {
+        this.nomalMap = nomalMap;
+    }
+
+    public Map<String, Object> getPathVaribleMap() {
+        return pathVaribleMap;
+    }
+
+    public void setPathVaribleMap(Map<String, Object> pathVaribleMap) {
+        this.pathVaribleMap = pathVaribleMap;
     }
 }
