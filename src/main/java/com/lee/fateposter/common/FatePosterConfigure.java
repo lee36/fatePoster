@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public class FatePosterConfigure implements BeanFactoryPostProcessor {
 
-    private static final String ENABLE_FATE_POSTER_NAME = EnableFatePoster.class.getName();
+    public static final String ENABLE_FATE_POSTER_NAME = EnableFatePoster.class.getName();
     private static final Boolean USE_DEFAULT_FILTER=false;
     private AnnotationMetadata annotationMetadata;
 

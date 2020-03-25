@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 
 import java.util.HashMap;
 
@@ -22,7 +23,8 @@ public class FatePosterApplication implements ApplicationRunner{
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        Object test = studentTest.test();
+        Object test = studentTest
+                .test(new HashMap());
         System.out.println(test);
     }
 }
