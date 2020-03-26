@@ -107,7 +107,6 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
         Response response = null;
         try {
             response = call.execute();
-            //responseConverter
             Object result = responseConverter.converter(info, response);
             return result;
         } catch (IOException e) {
