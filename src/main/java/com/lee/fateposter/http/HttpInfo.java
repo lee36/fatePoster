@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lee.fateposter.annotation.Poster;
 import com.lee.fateposter.common.FatePosterConfigure;
+import com.lee.fateposter.filter.UniqueRequestFilter;
 import com.lee.fateposter.proxy.FatePosterInvocationHandler;
 import org.springframework.boot.autoconfigure.security.servlet.AntPathRequestMatcherProvider;
 import org.springframework.core.type.StandardAnnotationMetadata;
@@ -38,6 +39,7 @@ public class HttpInfo {
     private Map<String,Object> pathVaribleMap;
     private Boolean isPathVarible;
     private Map<String,Parameter> parameterMap;
+    private UniqueRequestFilter uniqueRequestFilter;
 
     public static final String REGEX= "\\{([^}]*)\\}";
     public static final Class<PathVariable> PATH_VARIBLE_CLASS= PathVariable.class;
@@ -47,11 +49,23 @@ public class HttpInfo {
        wrapInfo(method,args);
     }
 
+    public UniqueRequestFilter getUniqueRequestFilter() {
+        return uniqueRequestFilter;
+    }
 
-    private void wrapInfo(Method method, List<Object> args) {
+    public void setUniqueRequestFilter(UniqueRequestFilter uniqueRequestFilter) {
+        this.uniqueRequestFilter = uniqueRequestFilter;
+    }
+
+    private void wrapInfo(Method method, List<Object> args){
         Poster annotation =
                 method.getAnnotation(FatePosterInvocationHandler.POSTER_CLASS);
         this.hearders = wrapHeader(annotation.header());
+        try {
+            this.uniqueRequestFilter = (UniqueRequestFilter) annotation.filter().newInstance();
+        }catch (Exception e){
+            throw new RuntimeException("@poster filter must be an instance of UniqueRequestFilter");
+        }
         this.requestMethod = annotation.method();
         wrapParams(method,args);
         this.reponseType=wrapReponse(method);

@@ -9,7 +9,7 @@ import okhttp3.Request;
  * @create 2020/3/25 0025 13:05
  */
 public class FirsterRequestFilter implements RequestFilter {
-    public void filter(Request request){
-
+    public Request filter(Request request){
+       return request;
     }
 }

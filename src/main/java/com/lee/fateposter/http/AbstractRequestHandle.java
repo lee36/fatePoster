@@ -90,15 +90,20 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
     @Override
     public Object handleHttp(HttpInfo info) {
         Request request = buildRequest(info);
-        //有必要可以用拦截器做一些修改
+        //全局拦截器
+        Request passRquest=request;
         for (RequestFilter requestFilter : requestFilterList) {
-            requestFilter.filter(request);
+            Request temp = requestFilter.filter(passRquest);
+            passRquest=temp;
+        }
+        if(!Objects.isNull(info.getUniqueRequestFilter())){
+            passRquest=info.getUniqueRequestFilter().uniqueFilter(passRquest);
         }
         OkHttpClient httpClient = beanFactory.getBean(OkHttpClient.class);
         if(Objects.isNull(httpClient)){
             throw new RuntimeException("please insure at last a instance which is OkHttpClient");
         }
-        Call call = httpClient.newCall(request);
+        Call call = httpClient.newCall(passRquest);
         Response response = null;
         try {
             response = call.execute();
@@ -106,7 +111,6 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
             Object result = responseConverter.converter(info, response);
             return result;
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException("exec fail");
         }
     }

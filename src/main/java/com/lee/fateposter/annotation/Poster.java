@@ -1,5 +1,7 @@
 package com.lee.fateposter.annotation;
 
+import com.lee.fateposter.filter.FirstUniqueRequestFilter;
+import com.lee.fateposter.filter.UniqueRequestFilter;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -12,4 +14,5 @@ public @interface Poster {
     public String url();
     public RequestMethod method() default RequestMethod.GET;
     public String[] header() default {};
+    public Class<?> filter() default FirstUniqueRequestFilter.class;
 }
