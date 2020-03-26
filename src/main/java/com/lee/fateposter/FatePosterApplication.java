@@ -25,7 +25,7 @@ public class FatePosterApplication implements ApplicationRunner{
         user.setAge(18);
         user.setName("zhangsan");
         String test = studentTest
-                .test(user);
+                .test(1,user);
         System.out.println(test);
     }
 }

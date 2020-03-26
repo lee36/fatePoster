@@ -3,6 +3,7 @@ package com.lee.fateposter.config;
 import com.lee.fateposter.http.DefaultRequestHandle;
 import com.lee.fateposter.proxy.FatePosterInvocationHandler;
 import okhttp3.OkHttpClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,6 +21,7 @@ public class FatePostConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public OkHttpClient client(){
         OkHttpClient.Builder builder =
                 new OkHttpClient.Builder();

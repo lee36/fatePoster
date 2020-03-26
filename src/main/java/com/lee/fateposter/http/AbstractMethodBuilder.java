@@ -47,11 +47,12 @@ public abstract class AbstractMethodBuilder implements MethodBuilder {
         for (String key : map.keySet()) {
             Object param = map.get(key);
             Class<?> aClass = param.getClass();
-            if(!isNotComplexClass(aClass)){
+            if(isNotComplexClass(aClass)){
                 urlBuilder.addQueryParameter(key,param+"");
             }else {
-                Field[] fields = aClass.getFields();
+                Field[] fields = aClass.getDeclaredFields();
                 for (Field field : fields) {
+                    field.setAccessible(true);
                     urlBuilder.addQueryParameter(field.getName(), field.get(param) + "");
                 }
             }
