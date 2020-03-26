@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.lee.fateposter.test.User;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.jws.soap.SOAPBinding;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +18,7 @@ import java.util.Map;
 @RestController
 public class TestController {
     @RequestMapping("/app/test/{id}")
-    public List test(@PathVariable Integer id, @RequestBody User user){
-        return ImmutableList.<Object>of(id,user);
+    public User test(@PathVariable Integer id, User user){
+        return user;
     }
 }

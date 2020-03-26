@@ -5,11 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lee.fateposter.converter.FirsterRequestConverter;
 import com.lee.fateposter.converter.RequestConverter;
 import okhttp3.*;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.Set;
 
 /**
  * @description TODO
@@ -50,10 +54,17 @@ public abstract class AbstractMethodBuilder implements MethodBuilder {
             if(isNotComplexClass(aClass)){
                 urlBuilder.addQueryParameter(key,param+"");
             }else {
-                Field[] fields = aClass.getDeclaredFields();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    urlBuilder.addQueryParameter(field.getName(), field.get(param) + "");
+                Map<String,Object> isMap = checkIsMap(param);
+                if(!CollectionUtils.isEmpty(isMap)){
+                    for (String key1 : isMap.keySet()) {
+                        urlBuilder.addQueryParameter(key1,isMap.get(key1)+"");
+                    }
+                }else {
+                    Field[] fields = aClass.getDeclaredFields();
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+                        urlBuilder.addQueryParameter(field.getName(), field.get(param) + "");
+                    }
                 }
             }
         }
@@ -73,10 +84,17 @@ public abstract class AbstractMethodBuilder implements MethodBuilder {
             if(isNotComplexClass(aClass)){
                 builder.add(key,param+"");
             }else {
-                Field[] fields = aClass.getDeclaredFields();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    builder.add(field.getName(), field.get(param) + "");
+                Map<String,Object> isMap = checkIsMap(param);
+                if(!CollectionUtils.isEmpty(isMap)){
+                    for (String key1 : isMap.keySet()) {
+                        builder.add(key1,isMap.get(key1)+"");
+                    }
+                }else{
+                    Field[] fields = aClass.getDeclaredFields();
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+                        builder.add(field.getName(), field.get(param) + "");
+                    }
                 }
             }
         }
@@ -110,5 +128,11 @@ public abstract class AbstractMethodBuilder implements MethodBuilder {
            return true;
        }
        return false;
+    }
+    public Map<String,Object> checkIsMap(Object value){
+       if(value instanceof Map){
+          return (Map<String,Object>) value;
+       }
+       return null;
     }
 }

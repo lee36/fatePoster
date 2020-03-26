@@ -14,6 +14,6 @@ import java.util.Map;
  * @create 2020/3/24 0024 23:11
  */
 public interface MyTest {
-    @Poster(url = "http://localhost:8080/app/test/{id}",method = RequestMethod.POST,header = {"aa","123","bb","321"})
-    public String test(@PathVariable Integer id, @RequestBody User user);
+    @Poster(url = "http://localhost:8080/app/test/{id}",method = RequestMethod.GET,header = {"aa","123","bb","321"})
+    public Response test(@PathVariable Integer id, User user);
 }
