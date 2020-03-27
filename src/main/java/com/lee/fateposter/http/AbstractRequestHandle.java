@@ -92,6 +92,7 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
 
     @Override
     public Object handleHttp(HttpInfo info) {
+        buildPath(info);
         Request request = buildRequest(info);
         //全局拦截器
         Request passRquest=request;

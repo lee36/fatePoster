@@ -12,7 +12,6 @@ public class DefaultRequestHandle extends AbstractRequestHandle{
 
     @Override
     public Request buildRequest(HttpInfo info) {
-        buildPath(info);
         List<MethodBuilder> builderList =
                 getMethodBuilderList();
         for (MethodBuilder methodBuilder : builderList) {
