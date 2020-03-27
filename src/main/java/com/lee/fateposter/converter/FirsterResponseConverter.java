@@ -2,10 +2,7 @@ package com.lee.fateposter.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lee.fateposter.http.HttpInfo;
-import okhttp3.Call;
 import okhttp3.Response;
-import org.apache.catalina.User;
-
 import java.io.IOException;
 
 /**

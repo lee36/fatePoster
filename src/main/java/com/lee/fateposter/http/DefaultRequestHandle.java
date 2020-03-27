@@ -1,8 +1,5 @@
 package com.lee.fateposter.http;
-
 import okhttp3.Request;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 /**
@@ -12,8 +9,10 @@ import java.util.List;
  */
 public class DefaultRequestHandle extends AbstractRequestHandle{
 
+
     @Override
     public Request buildRequest(HttpInfo info) {
+        buildPath(info);
         List<MethodBuilder> builderList =
                 getMethodBuilderList();
         for (MethodBuilder methodBuilder : builderList) {
@@ -29,4 +28,5 @@ public class DefaultRequestHandle extends AbstractRequestHandle{
         }
         return null;
     }
+
 }

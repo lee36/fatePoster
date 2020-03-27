@@ -34,7 +34,7 @@ public class FatePosterInvocationHandler implements InvocationHandler, BeanFacto
         try {
             return method.invoke(this, args);
         }catch (Exception e){}
-        String id=method.toString();
+        String id=getUniqueId(method,args);
         HttpInfo info=null;
         if(httpInfos.containsKey(id)){
             info = httpInfos.get(id);
@@ -48,6 +48,17 @@ public class FatePosterInvocationHandler implements InvocationHandler, BeanFacto
         }
         RequestHandle handle = beanFactory.getBean(RequestHandle.class);
         return handle.handleHttp(info);
+    }
+
+    private String getUniqueId(Method method, Object[] args) {
+        if (args==null) {
+          return method.toString()+"";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (Object arg : args) {
+            builder.append(arg+"");
+        }
+        return method.toString()+builder.toString();
     }
 
 

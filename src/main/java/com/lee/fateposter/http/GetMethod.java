@@ -5,8 +5,6 @@ import okhttp3.HttpUrl;
 import okhttp3.Request;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.Map;
-
 /**
  * @description TODO
  * @Author lhj

@@ -1,7 +1,6 @@
 package com.lee.fateposter.http;
 
 import okhttp3.Headers;
-import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.springframework.web.bind.annotation.RequestMethod;

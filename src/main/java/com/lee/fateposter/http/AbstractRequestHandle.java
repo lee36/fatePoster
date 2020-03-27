@@ -1,8 +1,7 @@
 package com.lee.fateposter.http;
 
-import com.lee.fateposter.converter.FirsterRequestConverter;
+import com.lee.fateposter.annotation.Poster;
 import com.lee.fateposter.converter.FirsterResponseConverter;
-import com.lee.fateposter.converter.RequestConverter;
 import com.lee.fateposter.converter.ResponseConverter;
 import com.lee.fateposter.filter.FirsterRequestFilter;
 import com.lee.fateposter.filter.RequestFilter;
@@ -16,9 +15,11 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-
+import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @description TODO
@@ -31,6 +32,8 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
      private ResponseConverter responseConverter;
      private List<MethodBuilder> methodBuilderList;
      private ConfigurableListableBeanFactory beanFactory;
+
+    public static final String REGEX= "\\{([^}]*)\\}";
 
      public AbstractRequestHandle(){
          requestFilterList=new ArrayList<>();
@@ -145,5 +148,27 @@ public abstract class AbstractRequestHandle implements RequestHandle,BeanFactory
 
     public void setMethodBuilderList(List<MethodBuilder> methodBuilderList) {
         this.methodBuilderList = methodBuilderList;
+    }
+
+    public void buildPath(HttpInfo info){
+        if(!info.getPathVarible()){
+            info.setUrl(info.getAnnotation().url());
+        }else{
+            info.setUrl(wrapPathVarible(info.getAnnotation(),info.getPathVaribleMap()));
+        }
+        Optional.ofNullable(info.getUrl()).filter((str)-> !StringUtils.isEmpty(str))
+                .orElseThrow(()->new RuntimeException("please input the url"));
+    }
+
+    private String wrapPathVarible(Poster poster, Map<String,Object> params) {
+        String url = poster.url();
+        Pattern pattern = Pattern.compile(REGEX);
+        Matcher matcher = pattern.matcher(url);
+        while (matcher.find ()) {
+            String varibles=matcher.group();
+            Object value = params.get(varibles);
+            url = url.replace(varibles, value + "");
+        }
+        return url;
     }
 }
